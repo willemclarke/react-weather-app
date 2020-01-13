@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { Container, Jumbotron, Button } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { CurrentWeather } from "./components/CurrentWeather";
 import { Forecast } from "./components/Forecast";
 import * as _ from "lodash";
@@ -9,8 +10,9 @@ const weatherKey = process.env.REACT_APP_WEATHER_KEY;
 
 interface AppState {
   cityName: string;
+  date: string;
   isLoading: boolean;
-  temp: number;
+  temp: string;
   description: string;
   icon: string;
 }
@@ -18,33 +20,34 @@ interface AppState {
 const App: React.FC = () => {
   const [appState, updateAppState] = React.useState<AppState>({
     cityName: "Toowoomba",
+    date: "",
     isLoading: false,
-    temp: 0,
+    temp: "",
     description: "",
     icon: ""
   });
 
-  // inset [] somewhere in useEffect....
   React.useEffect(() => {
     updateWeather(appState.cityName).then(weatherData => {
-      const { temp, description, icon } = weatherData[0];
+      const { temp, description, icon, date } = weatherData[0];
       updateAppState({
         ...appState,
+        date: date,
         temp: temp,
         description: description,
         icon: icon
       });
     });
-  });
+  }, []); // [] ensures the API is only called once
 
   return (
     <Container fluid>
       <Jumbotron>
-        {renderTopSection(appState.cityName, appState.temp, appState.description, appState.icon)}
-        {/* <Forecast icon="11d" temp="30" description="Sunny" /> */}
+        {renderTopSection(appState.cityName, appState.date, appState.temp, appState.description, appState.icon)}
         <p>
-          <Button variant="primary">Select Location</Button>
+          <Button variant="primary" as="input" type="button" value="Select Location"></Button>
         </p>
+        {/* <Forecast icon="11d" temp="30" description="Sunny" /> */}
       </Jumbotron>
     </Container>
   );
@@ -54,7 +57,7 @@ interface WeatherResponse {
   list: [
     {
       main: {
-        temp: number;
+        temp: string;
       };
       weather: [
         {
@@ -62,14 +65,16 @@ interface WeatherResponse {
           icon: string;
         }
       ];
+      dt_text: string;
     }
   ];
 }
 
 interface Weather {
-  temp: number;
+  temp: string;
   description: string;
   icon: string;
+  date: string;
 }
 
 function updateWeather(cityName: string): Promise<Weather[]> {
@@ -82,8 +87,11 @@ function updateWeather(cityName: string): Promise<Weather[]> {
       });
 
       const temps = _.map(data, item => {
+        const formattedDate = item.dt_txt.substring(0, 10);
+
         return {
-          temp: item.main.temp,
+          date: formattedDate,
+          temp: `${item.main.temp}°C`,
           description: item.weather[0].description,
           icon: `http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`
         };
@@ -97,8 +105,8 @@ function updateWeather(cityName: string): Promise<Weather[]> {
     });
 }
 
-function renderTopSection(cityName: string, temp: number, description: string, icon: string) {
-  return <CurrentWeather cityName={cityName} temp={temp} description={description} icon={icon} />;
+function renderTopSection(cityName: string, date: string, temp: string, description: string, icon: string) {
+  return <CurrentWeather cityName={cityName} date={date} temp={temp} description={description} icon={icon} />;
 }
 
 export default App;

@@ -9,7 +9,7 @@ interface Props {
 export const Forecast = (props: Props) => {
   return (
     <div>
-      <img src={`http://openweathermap.org/img/wn/${props.icon}@2x.png`} />
+      <img src={props.icon} />
       <h3>{props.temp}</h3>
       <p>{props.description}</p>
     </div>
