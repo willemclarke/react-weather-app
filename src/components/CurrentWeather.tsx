@@ -3,7 +3,7 @@ import React from "react";
 interface Props {
   cityName: string;
   icon: string;
-  temp: string;
+  temp: number;
   description: string;
 }
 

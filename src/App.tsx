@@ -6,15 +6,41 @@ import { Forecast } from "./components/Forecast";
 import * as _ from "lodash";
 
 const weatherKey = process.env.REACT_APP_WEATHER_KEY;
-console.log(weatherKey);
+
+interface AppState {
+  cityName: string;
+  isLoading: boolean;
+  temp: number;
+  description: string;
+  icon: string;
+}
 
 const App: React.FC = () => {
-  const [cityName, updateCityName] = React.useState("London");
-  updateWeather(cityName);
+  const [appState, updateAppState] = React.useState<AppState>({
+    cityName: "Toowoomba",
+    isLoading: false,
+    temp: 0,
+    description: "",
+    icon: ""
+  });
+
+  // inset [] somewhere in useEffect....
+  React.useEffect(() => {
+    updateWeather(appState.cityName).then(weatherData => {
+      const { temp, description, icon } = weatherData[0];
+      updateAppState({
+        ...appState,
+        temp: temp,
+        description: description,
+        icon: icon
+      });
+    });
+  });
+
   return (
     <Container fluid>
       <Jumbotron>
-        <CurrentWeather cityName={cityName} temp="10" description="slightly drizzly" icon="10d" />
+        {renderTopSection(appState.cityName, appState.temp, appState.description, appState.icon)}
         {/* <Forecast icon="11d" temp="30" description="Sunny" /> */}
         <p>
           <Button variant="primary">Select Location</Button>
@@ -28,7 +54,7 @@ interface WeatherResponse {
   list: [
     {
       main: {
-        temp: string;
+        temp: number;
       };
       weather: [
         {
@@ -41,8 +67,8 @@ interface WeatherResponse {
 }
 
 interface Weather {
-  temp: any;
-  description: any;
+  temp: number;
+  description: string;
   icon: string;
 }
 
@@ -54,6 +80,7 @@ function updateWeather(cityName: string): Promise<Weather[]> {
       const data = res.data.list.filter((value: number, index: number) => {
         return index % 8 === 0;
       });
+
       const temps = _.map(data, item => {
         return {
           temp: item.main.temp,
@@ -68,6 +95,10 @@ function updateWeather(cityName: string): Promise<Weather[]> {
       console.error("Cannot fetch Weather Data from API", err);
       throw err;
     });
+}
+
+function renderTopSection(cityName: string, temp: number, description: string, icon: string) {
+  return <CurrentWeather cityName={cityName} temp={temp} description={description} icon={icon} />;
 }
 
 export default App;
