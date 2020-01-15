@@ -8,7 +8,7 @@ interface Props {
 
 export const Forecast = (props: Props) => {
   return (
-    <div>
+    <div className="forecast-section">
       <img src={props.icon} />
       <h3>{props.temp}</h3>
       <p>{props.description}</p>

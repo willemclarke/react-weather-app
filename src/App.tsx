@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, FormEvent } from "react";
 import axios from "axios";
-import { Container, Jumbotron, Button } from "react-bootstrap";
+import { Container, Jumbotron, Button, InputGroup, FormControl } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CurrentWeather } from "./components/CurrentWeather";
 import { Forecast } from "./components/Forecast";
@@ -17,14 +17,22 @@ interface AppState {
   icon: string;
 }
 
+interface OnChangeState {
+  cityName: string;
+}
+
 const App: React.FC = () => {
   const [appState, updateAppState] = React.useState<AppState>({
     cityName: "Toowoomba",
     date: "",
-    isLoading: false,
+    isLoading: true,
     temp: "",
     description: "",
     icon: ""
+  });
+
+  const [onChangeState, updateOnChangeState] = React.useState<OnChangeState>({
+    cityName: ""
   });
 
   React.useEffect(() => {
@@ -32,43 +40,42 @@ const App: React.FC = () => {
       const { temp, description, icon, date } = weatherData[0];
       updateAppState({
         ...appState,
+        isLoading: false,
         date: date,
         temp: temp,
         description: description,
         icon: icon
       });
+      console.log(appState, "straight after");
+      setTimeout(() => {
+        console.log(appState, "after 1 sec");
+      }, 1000);
     });
   }, []); // [] ensures the API is only called once
 
   return (
-    <Container fluid>
+    <Container>
       <Jumbotron>
         {renderTopSection(appState.cityName, appState.date, appState.temp, appState.description, appState.icon)}
-        <p>
-          <Button variant="primary" as="input" type="button" value="Select Location"></Button>
-        </p>
+        <InputGroup className="form-select-location">
+          <FormControl
+            placeholder="Select Location"
+            onChange={(event: React.FormEvent<HTMLInputElement>) => onChange(event, onChangeState, updateOnChangeState)}
+          />
+          <Button
+            variant="primary"
+            type="submit"
+            onClick={(event: React.FormEvent<HTMLButtonElement>) => onClick(onChangeState, appState, updateAppState)}
+          >
+            Submit
+          </Button>
+        </InputGroup>
+
         {/* <Forecast icon="11d" temp="30" description="Sunny" /> */}
       </Jumbotron>
     </Container>
   );
 };
-
-interface WeatherResponse {
-  list: [
-    {
-      main: {
-        temp: string;
-      };
-      weather: [
-        {
-          description: string;
-          icon: string;
-        }
-      ];
-      dt_text: string;
-    }
-  ];
-}
 
 interface Weather {
   temp: string;
@@ -88,7 +95,6 @@ function updateWeather(cityName: string): Promise<Weather[]> {
 
       const temps = _.map(data, item => {
         const formattedDate = item.dt_txt.substring(0, 10);
-
         return {
           date: formattedDate,
           temp: `${item.main.temp}°C`,
@@ -96,7 +102,6 @@ function updateWeather(cityName: string): Promise<Weather[]> {
           icon: `http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`
         };
       });
-      console.log(temps);
       return temps;
     })
     .catch(err => {
@@ -109,4 +114,42 @@ function renderTopSection(cityName: string, date: string, temp: string, descript
   return <CurrentWeather cityName={cityName} date={date} temp={temp} description={description} icon={icon} />;
 }
 
+function onChange(
+  event: React.FormEvent<HTMLInputElement>,
+  onChangeState: OnChangeState,
+  updateOnChangeState: (value: React.SetStateAction<OnChangeState>) => void
+) {
+  const cityName = event.currentTarget.value;
+  updateOnChangeState({
+    ...onChangeState,
+    cityName
+  });
+}
+
+function onClick(onChangeState: OnChangeState, appState: AppState, updateAppState: (value: React.SetStateAction<AppState>) => void) {
+  const cityName = onChangeState.cityName;
+  console.log(cityName);
+  updateAppState({
+    ...appState,
+    cityName
+  });
+}
+
 export default App;
+
+interface WeatherResponse {
+  list: [
+    {
+      main: {
+        temp: string;
+      };
+      weather: [
+        {
+          description: string;
+          icon: string;
+        }
+      ];
+      dt_text: string;
+    }
+  ];
+}

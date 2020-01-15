@@ -1,5 +1,6 @@
 import React from "react";
 import { Container, Jumbotron, Button } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 interface Props {
   cityName: string;
@@ -11,14 +12,14 @@ interface Props {
 
 export const CurrentWeather = (props: Props) => {
   return (
-    <div>
-      <h1>{props.cityName}</h1>
-      <h5>{props.date}</h5>
-      <h3>
+    <div className="current-weather-section">
+      <h1 className="current-city-name"> {props.cityName}</h1>
+      <h3 className="current-date">{props.date}</h3>
+      <h3 className="current-icon-and-temp">
         <img src={props.icon} />
         {props.temp}
       </h3>
-      <p>{props.description}</p>
+      <p className="current-description">{props.description}</p>
     </div>
   );
 };
