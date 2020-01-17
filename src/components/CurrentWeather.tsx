@@ -2,7 +2,7 @@ import React from "react";
 import { Container, Jumbotron, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-interface Props {
+export interface Props {
   cityName: string;
   date: string;
   icon: string;

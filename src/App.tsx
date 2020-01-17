@@ -17,60 +17,57 @@ interface AppState {
   icon: string;
 }
 
-interface OnChangeState {
-  cityName: string;
-}
+// interface CityNameState {
+//   cityName: string;
+// }
 
 const App: React.FC = () => {
   const [appState, updateAppState] = React.useState<AppState>({
     cityName: "Toowoomba",
     date: "",
-    isLoading: true,
+    isLoading: false,
     temp: "",
     description: "",
     icon: ""
   });
 
-  const [onChangeState, updateOnChangeState] = React.useState<OnChangeState>({
-    cityName: ""
-  });
+  const [cityNameState, updateCityNameState] = React.useState<any>("");
+  // console.log(onChangeState, "ON CHANGE STATE");
+
+  console.log(appState, "APPSTATE");
 
   React.useEffect(() => {
     updateWeather(appState.cityName).then(weatherData => {
       const { temp, description, icon, date } = weatherData[0];
       updateAppState({
         ...appState,
-        isLoading: false,
+        isLoading: true,
         date: date,
         temp: temp,
         description: description,
         icon: icon
       });
-      console.log(appState, "straight after");
-      setTimeout(() => {
-        console.log(appState, "after 1 sec");
-      }, 1000);
     });
-  }, []); // [] ensures the API is only called once
+  }, [appState]);
+  // {renderTopSection(appState.cityName, appState.date, appState.temp, appState.description, appState.icon)}
 
   return (
     <Container>
       <Jumbotron>
-        {renderTopSection(appState.cityName, appState.date, appState.temp, appState.description, appState.icon)}
+        {CurrentWeather(appState)}
         <InputGroup className="form-select-location">
           <FormControl
             placeholder="Select Location"
-            onChange={(event: React.FormEvent<HTMLInputElement>) => onChange(event, onChangeState, updateOnChangeState)}
+            onChange={(event: React.FormEvent<HTMLInputElement>) => onChange(event, cityNameState, updateCityNameState)}
           />
           <Button
             variant="primary"
             type="submit"
-            onClick={(event: React.FormEvent<HTMLButtonElement>) => onClick(onChangeState, appState, updateAppState)}
+            onClick={(event: React.FormEvent<HTMLButtonElement>) => onClick(cityNameState, appState, updateAppState)}
           >
             Submit
           </Button>
         </InputGroup>
-
         {/* <Forecast icon="11d" temp="30" description="Sunny" /> */}
       </Jumbotron>
     </Container>
@@ -110,30 +107,31 @@ function updateWeather(cityName: string): Promise<Weather[]> {
     });
 }
 
-function renderTopSection(cityName: string, date: string, temp: string, description: string, icon: string) {
-  return <CurrentWeather cityName={cityName} date={date} temp={temp} description={description} icon={icon} />;
-}
-
+// on the onChange event,update the cityNameState to contain the value inputted into the input-group
 function onChange(
   event: React.FormEvent<HTMLInputElement>,
-  onChangeState: OnChangeState,
-  updateOnChangeState: (value: React.SetStateAction<OnChangeState>) => void
-) {
+  cityNameState: any,
+  updateCityNameState: (value: React.SetStateAction<any>) => void
+): void {
   const cityName = event.currentTarget.value;
-  updateOnChangeState({
-    ...onChangeState,
+  updateCityNameState({
+    ...cityNameState,
     cityName
   });
 }
 
-function onClick(onChangeState: OnChangeState, appState: AppState, updateAppState: (value: React.SetStateAction<AppState>) => void) {
-  const cityName = onChangeState.cityName;
+// on the onClick event, pass the value from cityNameState (cityName) into the appState -> thus trigger state update
+function onClick(cityNameState: any, appState: AppState, updateAppState: (value: React.SetStateAction<AppState>) => void): void {
+  const cityName = cityNameState.cityName;
   console.log(cityName);
   updateAppState({
     ...appState,
-    cityName
+    cityName,
+    isLoading: true
   });
 }
+
+function manageState() {}
 
 export default App;
 
