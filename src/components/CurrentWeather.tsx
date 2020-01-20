@@ -1,25 +1,21 @@
 import React from "react";
-import { Container, Jumbotron, Button } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { TempData } from "../App";
 
 export interface Props {
-  cityName: string;
-  date: string;
-  icon: string;
-  temp: string;
-  description: string;
+  temp: TempData;
 }
 
 export const CurrentWeather = (props: Props) => {
+  const { temp } = props;
   return (
     <div className="current-weather-section">
-      <h1 className="current-city-name"> {props.cityName}</h1>
-      <h3 className="current-date">{props.date}</h3>
+      <h1 className="current-city-name"> {temp.cityName}</h1>
+      <h3 className="current-date">{temp.date}</h3>
       <h3 className="current-icon-and-temp">
-        <img src={props.icon} />
-        {props.temp}
+        <img src={temp.icon} />
+        {temp.temp}
       </h3>
-      <p className="current-description">{props.description}</p>
+      <p className="current-description">{temp.description}</p>
     </div>
   );
 };

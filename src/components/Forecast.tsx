@@ -1,17 +1,16 @@
 import React from "react";
+import { TempData } from "../App";
+import { Day } from "./Day";
+import * as _ from "lodash";
 
 interface Props {
-  icon: string;
-  temp: string;
-  description: string;
+  temps: TempData[];
 }
 
 export const Forecast = (props: Props) => {
-  return (
-    <div className="forecast-section">
-      <img src={props.icon} />
-      <h3>{props.temp}</h3>
-      <p>{props.description}</p>
-    </div>
-  );
+  const { temps } = props;
+  const days = _.map(temps, temp => {
+    return <Day temp={temp} />;
+  });
+  return <div>{days}</div>;
 };
