@@ -34,12 +34,13 @@ const App: React.FC = () => {
 
   return (
     <Container>
-      <Jumbotron>
+      <Jumbotron style={{ backgroundColor: "#445a71", color: "#fff" }}>
         {currentWeather}
-        <InputGroup className="form-select-location">
+        <InputGroup className="form-select-location" style={{ margin: "0 auto", float: "none", width: "25%" }}>
           <FormControl
             placeholder="Select Location"
             onChange={(event: React.FormEvent<HTMLInputElement>) => setCityNameInput(event.currentTarget.value)}
+            style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
           />
           <Button variant="primary" type="submit" onClick={(event: React.FormEvent<HTMLButtonElement>) => fetchData(cityNameInput)}>
             Submit
